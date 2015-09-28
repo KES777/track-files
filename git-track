@@ -105,10 +105,8 @@ import() {
     cd $( _repo_path )
     cat list | while read line || [ -n "$line" ]; do
         set -- $line
-        md5="$( _import_file $5 )"
-        git add db/$md5
+        _import_file $5
     done
-    git add list
 }
 
 
