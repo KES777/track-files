@@ -33,8 +33,8 @@ _import_file() {
     file=$1
     [ ! -f $file ] && return
 
-    hash="$( _md5 $@ )"
-    stat="$( _stat $@ )"
+    hash="$( _md5 $file )"
+    stat="$( _stat $file )"
 
     [ ! -d "db" ] && mkdir 'db'
 
