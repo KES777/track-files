@@ -1,0 +1,163 @@
+#!/bin/sh
+
+
+cd_to_repo() {
+    # expand ~ to absolute path
+    eval repo=`git config track.repo`
+    cd $repo
+}
+
+
+
+_abs() {
+    echo -n "$(cd "$(dirname "$1")"; pwd)/$(basename "$1")"
+}
+
+
+
+_md5() {
+    file="$( _abs $@ )"
+    echo -n $file | md5sum | awk '{print $1}'
+}
+
+
+
+_stat() {
+    stat=`stat -c "%A %U %G" $file`
+    echo -n $stat
+}
+
+
+
+_import_file() {
+    file=$1
+    [ ! -e $file ] && return
+
+    hash="$( _md5 $@ )"
+    stat="$( _stat $@ )"
+
+    cp $file db/$hash
+
+    cat list | grep -v $hash > list.tmp
+    mv list.tmp list
+
+    echo "$hash $stat $file" >> list
+
+    echo -n $hash
+}
+
+
+
+add() {
+    CWD=`pwd`
+    cd_to_repo
+    for file in $@; do
+        hash="$( _import_file $CWD/$file )"
+        git add db/$hash
+    done
+    git add list
+}
+
+
+
+rm() {
+    echo 'Not implemented'
+}
+
+
+
+check() {
+    cd_to_repo
+    cat list | while read line || [ -n "$line" ]
+    do
+        set -- $line
+        hash=$1;file=$5
+        if [ ! -f db/$hash ]; then
+            git checkout db/$hash
+        fi
+        git diff db/$hash $file
+    done
+}
+
+
+
+log() {
+    cd_to_repo
+    git log $@
+}
+
+
+
+status() {
+    cd_to_repo
+    git status
+}
+
+
+
+import() {
+    cd_to_repo
+    cat list | while read line || [ -n "$line" ]; do
+        set -- $line
+        md5="$( _import_file $5 )"
+        git add db/$md5
+    done
+    git add list
+}
+
+
+
+_export() {
+    cd_to_repo
+    cat list | while read line || [ -n "$line" ]; do
+        set -- $line
+        hash=$1
+        file=$5
+        mv db/$hash $file
+    done
+    git checkout -f
+}
+
+
+
+sdiff() {
+    file="$( _abs $@ )"
+    hash="$( _md5 $@ )"
+    cd_to_repo
+    git diff db/$hash $file
+}
+
+
+
+diff() {
+    hash="$( _md5 $@ )"
+    cd_to_repo
+    echo $@ $hash $last
+    git diff db/$hash
+}
+
+
+
+commit() {
+    cd_to_repo
+    git commit $@
+}
+
+
+
+main() {
+    if [ -z "$1" ]; then
+        set -- status
+    fi
+    if [ "$1" = "export" ]; then
+        shift
+        _export $@
+    else
+        cmd=$1; shift
+        $cmd $@
+    fi
+}
+
+
+
+main $@
