@@ -16,7 +16,7 @@ _abs() {
 
 
 _md5() {
-    file="$( _abs $@ )"
+    file="$( echo -n $1 | sed -e s#^$HOME#\~# )"
     echo -n $file | md5sum | awk '{print $1}'
 }
 
