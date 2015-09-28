@@ -1,10 +1,10 @@
 #!/bin/sh
 
 
-cd_to_repo() {
+_repo_path() {
     # expand ~ to absolute path
     eval repo=`git config track.repo`
-    cd $repo
+    echo $repo
 }
 
 
@@ -57,7 +57,7 @@ _import_file() {
 
 add() {
     CWD=`pwd`
-    cd_to_repo
+    cd $( _repo_path )
     for file in $@; do
         hash="$( _import_file $CWD/$file )"
         git add db/$hash
@@ -74,7 +74,7 @@ rm() {
 
 
 check() {
-    cd_to_repo
+    cd $( _repo_path )
     cat list | while read line || [ -n "$line" ]
     do
         set -- $line
@@ -89,21 +89,21 @@ check() {
 
 
 log() {
-    cd_to_repo
+    cd $( _repo_path )
     git log $@
 }
 
 
 
 status() {
-    cd_to_repo
+    cd $( _repo_path )
     git status
 }
 
 
 
 import() {
-    cd_to_repo
+    cd $( _repo_path )
     cat list | while read line || [ -n "$line" ]; do
         set -- $line
         md5="$( _import_file $5 )"
@@ -115,7 +115,7 @@ import() {
 
 
 _export() {
-    cd_to_repo
+    cd $( _repo_path )
     cat list | while read line || [ -n "$line" ]; do
         set -- $line
         hash=$1
@@ -130,7 +130,7 @@ _export() {
 sdiff() {
     file="$( _abs $@ )"
     hash="$( _md5 $@ )"
-    cd_to_repo
+    cd $( _repo_path )
     git diff db/$hash $file
 }
 
@@ -138,7 +138,7 @@ sdiff() {
 
 diff() {
     hash="$( _md5 $@ )"
-    cd_to_repo
+    cd $( _repo_path )
     echo $@ $hash $last
     git diff db/$hash
 }
@@ -146,7 +146,7 @@ diff() {
 
 
 commit() {
-    cd_to_repo
+    cd $( _repo_path )
     git commit $@
 }
 
