@@ -15,8 +15,13 @@ _abs() {
 
 
 
+_fallback_home() {
+    echo "$( echo -n $1 | sed -e s#^$HOME#\~# )"
+}
+
+
 _md5() {
-    file="$( echo -n $1 | sed -e s#^$HOME#\~# )"
+    file="$( _fallback_home $1 )"
     echo -n $file | md5sum | awk '{print $1}'
 }
 
@@ -35,10 +40,10 @@ _import_file() {
 
     hash="$( _md5 $file )"
     stat="$( _stat $file )"
+    file="$( _fallback_home $1 )"
 
     [ ! -d "db" ] && mkdir 'db'
-
-    cp $file db/$hash
+    eval cp $file db/$hash
 
     cat list | grep -v $hash > list.tmp
     mv list.tmp list
