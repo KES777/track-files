@@ -31,7 +31,7 @@ _stat() {
 
 _import_file() {
     file=$1
-    [ ! -e $file ] && return
+    [ ! -f $file ] && return
 
     hash="$( _md5 $@ )"
     stat="$( _stat $@ )"
