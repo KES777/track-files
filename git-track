@@ -36,6 +36,8 @@ _import_file() {
     hash="$( _md5 $@ )"
     stat="$( _stat $@ )"
 
+    [ ! -d "db" ] && mkdir 'db'
+
     cp $file db/$hash
 
     cat list | grep -v $hash > list.tmp
