@@ -104,7 +104,7 @@ import() {
     cat list | while read line || [ -n "$line" ]; do
         set -- $line
         # expand ~ to absolute path
-        eval _import_file $5
+        eval hash=$( _import_file $5 )
     done
 }
 
@@ -127,7 +127,6 @@ sdiff() {
     file="$( _abs $1 )"
     hash="$( _md5 $( _fallback_home $file ) )"
     cd $( _repo_path )
-    echo $hash $file
     git diff db/$hash $file
 }
 
