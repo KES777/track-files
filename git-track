@@ -105,7 +105,8 @@ import() {
     cd $( _repo_path )
     cat list | while read line || [ -n "$line" ]; do
         set -- $line
-        _import_file $5
+        # expand ~ to absolute path
+        eval _import_file $5
     done
 }
 
