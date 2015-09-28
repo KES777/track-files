@@ -21,8 +21,7 @@ _fallback_home() {
 
 
 _md5() {
-    file="$( _fallback_home $1 )"
-    echo -n $file | md5sum | awk '{print $1}'
+    echo -n $1 | md5sum | awk '{print $1}'
 }
 
 
