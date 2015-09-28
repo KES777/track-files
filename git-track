@@ -73,7 +73,7 @@ check() {
     cat list | while read line || [ -n "$line" ]
     do
         set -- $line
-        hash=$1;file=$5
+        hash=$1;eval file=$5
         if [ ! -f db/$hash ]; then
             git checkout db/$hash
         fi
