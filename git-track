@@ -34,20 +34,12 @@ _stat() {
 
 
 _import_file() {
+    [ ! -f "$1" ] && return
+    [ ! -d "$( _repo_path )/db" ] && mkdir 'db'
     file=$1
-    [ ! -f $file ] && return
+    hash="$( _md5 $( _fallback_home $file ) )"
 
-    hash="$( _md5 $file )"
-    stat="$( _stat $file )"
-    file="$( _fallback_home $1 )"
-
-    [ ! -d "db" ] && mkdir 'db'
-    eval cp $file db/$hash
-
-    cat list | grep -v $hash > list.tmp
-    mv list.tmp list
-
-    echo "$hash $stat $file" >> list
+    cp $file $( _repo_path )/db/$hash
 
     echo -n $hash
 }
@@ -60,6 +52,12 @@ add() {
     for file in $@; do
         hash="$( _import_file $CWD/$file )"
         git add db/$hash
+
+        cat list | grep -v $hash > list.tmp
+        mv list.tmp list
+
+        stat="$( _stat $CWD/$file )"
+        echo "$hash $stat $( _fallback_home $CWD/$file )" >> list
     done
     git add list
 }
