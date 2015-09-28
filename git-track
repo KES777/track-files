@@ -23,7 +23,7 @@ _md5() {
 
 
 _stat() {
-    stat=`stat -c "%A %U %G" $file`
+    stat="$( stat -c "%A %U %G" $1 | sed -e s#$USER#\~#g )"
     echo -n $stat
 }
 
