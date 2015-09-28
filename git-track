@@ -127,18 +127,18 @@ _export() {
 
 
 sdiff() {
-    file="$( _abs $@ )"
-    hash="$( _md5 $@ )"
+    file="$( _abs $1 )"
+    hash="$( _md5 $( _fallback_home $file ) )"
     cd $( _repo_path )
+    echo $hash $file
     git diff db/$hash $file
 }
 
 
 
 diff() {
-    hash="$( _md5 $@ )"
+    hash="$( _md5 $( _fallback_home $( _abs $1 ) ) )"
     cd $( _repo_path )
-    echo $@ $hash $last
     git diff db/$hash
 }
 
